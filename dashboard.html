@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🏠 家庭記帳 - 首頁</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --primary: #FF8A5B;
+      --primary-dark: #E67648;
+      --success: #22C55E;
+      --danger: #EF4444;
+      --warning: #F59E0B;
+      --info: #3B82F6;
+      --dark: #1A2B4A;
+      --gray: #4A5568;
+      --light: #F7F8FA;
+      --white: #FFFFFF;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--light);
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+    
+    /* Header */
+    .header {
+      background: var(--primary);
+      color: white;
+      padding: 20px;
+      border-radius: 0 0 24px 24px;
+    }
+    
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .header-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    
+    .avatar {
+      width: 40px;
+      height: 40px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    
+    .month-selector {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .month-selector button {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    /* Summary Cards */
+    .summary-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    
+    .summary-card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(26, 43, 74, 0.06);
+    }
+    
+    .summary-card.income {
+      border-left: 4px solid var(--success);
+    }
+    
+    .summary-card.expense {
+      border-left: 4px solid var(--danger);
+    }
+    
+    .summary-label {
+      font-size: 14px;
+      color: var(--gray);
+      margin-bottom: 4px;
+    }
+    
+    .summary-value {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    
+    .summary-value.income { color: var(--success); }
+    .summary-value.expense { color: var(--danger); }
+    
+    .summary-card.balance {
+      grid-column: span 2;
+      border-left: 4px solid var(--primary);
+      text-align: center;
+    }
+    
+    .summary-card.balance .summary-value {
+      color: var(--dark);
+      font-size: 32px;
+    }
+    
+    /* Budget Progress */
+    .budget-section {
+      background: white;
+      margin: 16px;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(26, 43, 74, 0.06);
+    }
+    
+    .budget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .budget-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+    
+    .budget-amount {
+      font-size: 14px;
+      color: var(--gray);
+    }
+    
+    .budget-bar {
+      height: 12px;
+      background: var(--light);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    
+    .budget-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--success), var(--warning));
+      border-radius: 6px;
+      width: 65%;
+      transition: width 0.3s ease;
+    }
+    
+    .budget-fill.warning {
+      background: linear-gradient(90deg, var(--warning), var(--danger));
+    }
+    
+    /* Transactions */
+    .transactions-section {
+      margin: 16px;
+    }
+    
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+    
+    .see-all {
+      font-size: 14px;
+      color: var(--primary);
+      text-decoration: none;
+    }
+    
+    .transaction-list {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(26, 43, 74, 0.06);
+    }
+    
+    .transaction-item {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      border-bottom: 1px solid var(--light);
+    }
+    
+    .transaction-item:last-child {
+      border-bottom: none;
+    }
+    
+    .transaction-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-right: 12px;
+    }
+    
+    .icon-food { background: #FEF3C7; }
+    .icon-transport { background: #DBEAFE; }
+    .icon-shopping { background: #FCE7F3; }
+    .icon-salary { background: #D1FAE5; }
+    .icon-medical { background: #FEE2E2; }
+    
+    .transaction-info {
+      flex: 1;
+    }
+    
+    .transaction-category {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--dark);
+    }
+    
+    .transaction-date {
+      font-size: 12px;
+      color: var(--gray);
+    }
+    
+    .transaction-amount {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .transaction-amount.income { color: var(--success); }
+    .transaction-amount.expense { color: var(--danger); }
+    
+    /* FAB Button */
+    .fab {
+      position: fixed;
+      right: 20px;
+      bottom: 90px;
+      width: 56px;
+      height: 56px;
+      background: var(--primary);
+      border-radius: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 28px;
+      box-shadow: 0 4px 16px rgba(255, 138, 91, 0.4);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+    
+    .fab:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(255, 138, 91, 0.5);
+    }
+    
+    /* Tab Bar */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+    }
+    
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: var(--gray);
+      font-size: 11px;
+      gap: 4px;
+    }
+    
+    .tab-item.active {
+      color: var(--primary);
+    }
+    
+    .tab-item .icon {
+      font-size: 22px;
+    }
+    
+    .tab-item.add .icon {
+      background: var(--primary);
+      color: white;
+      width: 44px;
+      height: 44px;
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-top: -22px;
+      box-shadow: 0 4px 12px rgba(255, 138, 91, 0.4);
+    }
+    
+    /* Page Nav */
+    .page-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      padding: 8px;
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      z-index: 100;
+    }
+    
+    .page-nav a {
+      padding: 6px 12px;
+      background: var(--light);
+      border-radius: 16px;
+      text-decoration: none;
+      color: var(--dark);
+      font-size: 12px;
+    }
+    
+    .page-nav a:hover, .page-nav a.active {
+      background: var(--primary);
+      color: white;
+    }
+  </style>
+</head>
+<body style="padding-top: 50px;">
+  <div class="page-nav">
+    <a href="login.html">登入</a>
+    <a href="dashboard.html" class="active">首頁</a>
+    <a href="add.html">記帳</a>
+    <a href="charts.html">圖表</a>
+    <a href="settle.html">分帳</a>
+    <a href="settings.html">設定</a>
+  </div>
+  
+  <!-- Header -->
+  <div class="header">
+    <div class="header-top">
+      <span class="header-title">👋 你好啊！</span>
+      <div class="avatar">👨</div>
+    </div>
+    <div class="month-selector">
+      <button>&lt;</button>
+      <span>2026年4月</span>
+      <button>&gt;</button>
+    </div>
+  </div>
+  
+  <!-- Summary Cards -->
+  <div style="padding: 16px;">
+    <div class="summary-cards">
+      <div class="summary-card income">
+        <div class="summary-label">收入</div>
+        <div class="summary-value income">+ HK$32,000</div>
+      </div>
+      <div class="summary-card expense">
+        <div class="summary-label">支出</div>
+        <div class="summary-value expense">- HK$18,450</div>
+      </div>
+      <div class="summary-card balance">
+        <div class="summary-label">本月結餘</div>
+        <div class="summary-value">+ HK$13,550</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Budget Progress -->
+  <div class="budget-section">
+    <div class="budget-header">
+      <span class="budget-title">🍽️ 飲食預算</span>
+      <span class="budget-amount">HK$6,500 / HK$10,000</span>
+    </div>
+    <div class="budget-bar">
+      <div class="budget-fill" style="width: 65%;"></div>
+    </div>
+  </div>
+  
+  <div class="budget-section">
+    <div class="budget-header">
+      <span class="budget-title">🛒 購物預算</span>
+      <span class="budget-amount">HK$4,200 / HK$5,000</span>
+    </div>
+    <div class="budget-bar">
+      <div class="budget-fill warning" style="width: 84%;"></div>
+    </div>
+  </div>
+  
+  <!-- Recent Transactions -->
+  <div class="transactions-section">
+    <div class="section-header">
+      <span class="section-title">📋 最近的記錄</span>
+      <a href="#" class="see-all">查看全部</a>
+    </div>
+    
+    <div class="transaction-list">
+      <div class="transaction-item">
+        <div class="transaction-icon icon-food">🍜</div>
+        <div class="transaction-info">
+          <div class="transaction-category">茶餐廳</div>
+          <div class="transaction-date">今日 12:30</div>
+        </div>
+        <div class="transaction-amount expense">- HK$45</div>
+      </div>
+      
+      <div class="transaction-item">
+        <div class="transaction-icon icon-transport">🚇</div>
+        <div class="transaction-info">
+          <div class="transaction-category">港鐵</div>
+          <div class="transaction-date">今日 08:15</div>
+        </div>
+        <div class="transaction-amount expense">- HK$12.8</div>
+      </div>
+      
+      <div class="transaction-item">
+        <div class="transaction-icon icon-shopping">🛍️</div>
+        <div class="transaction-info">
+          <div class="transaction-category">Uniqlo</div>
+          <div class="transaction-date">昨日 19:22</div>
+        </div>
+        <div class="transaction-amount expense">- HK$399</div>
+      </div>
+      
+      <div class="transaction-item">
+        <div class="transaction-icon icon-salary">💰</div>
+        <div class="transaction-info">
+          <div class="transaction-category">薪酬</div>
+          <div class="transaction-date">1/4 月</div>
+        </div>
+        <div class="transaction-amount income">+ HK$32,000</div>
+      </div>
+      
+      <div class="transaction-item">
+        <div class="transaction-icon icon-medical">🏥</div>
+        <div class="transaction-info">
+          <div class="transaction-category">醫療</div>
+          <div class="transaction-date">20/4 月</div>
+        </div>
+        <div class="transaction-amount expense">- HK$280</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- FAB -->
+  <a href="add.html" class="fab">+</a>
+  
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <a href="dashboard.html" class="tab-item active">
+      <span class="icon">🏠</span>
+      <span>首頁</span>
+    </a>
+    <a href="charts.html" class="tab-item">
+      <span class="icon">📊</span>
+      <span>圖表</span>
+    </a>
+    <a href="add.html" class="tab-item add">
+      <span class="icon">+</span>
+    </a>
+    <a href="settle.html" class="tab-item">
+      <span class="icon">🔄</span>
+      <span>分帳</span>
+    </a>
+    <a href="settings.html" class="tab-item">
+      <span class="icon">⚙️</span>
+      <span>設定</span>
+    </a>
+  </div>
+</body>
+</html>

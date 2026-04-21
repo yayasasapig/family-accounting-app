@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔄 分帳 - 家庭記帳</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --primary: #FF8A5B;
+      --primary-dark: #E67648;
+      --success: #22C55E;
+      --danger: #EF4444;
+      --warning: #F59E0B;
+      --info: #3B82F6;
+      --dark: #1A2B4A;
+      --gray: #4A5568;
+      --light: #F7F8FA;
+      --white: #FFFFFF;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--light);
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+    
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--primary), #FF6B6B);
+      color: white;
+      padding: 24px 20px;
+      border-radius: 0 0 24px 24px;
+      text-align: center;
+    }
+    
+    .header-title {
+      font-size: 24px;
+      font-weight: 600;
+    }
+    
+    .header-subtitle {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+    
+    /* Page Nav */
+    .page-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      padding: 8px;
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      z-index: 100;
+    }
+    
+    .page-nav a {
+      padding: 6px 12px;
+      background: var(--light);
+      border-radius: 16px;
+      text-decoration: none;
+      color: var(--dark);
+      font-size: 12px;
+    }
+    
+    .page-nav a:hover, .page-nav a.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    /* Members Section */
+    .members-section {
+      padding: 20px 16px;
+    }
+    
+    .members-card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(26, 43, 74, 0.06);
+    }
+    
+    .members-row {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+    
+    .member {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .member-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+    
+    .member-avatar.you {
+      background: linear-gradient(135deg, #DBEAFE, #93C5FD);
+    }
+    
+    .member-avatar.wife {
+      background: linear-gradient(135deg, #FCE7F3, #F9A8D4);
+    }
+    
+    .member-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+    
+    .member-amount {
+      font-size: 13px;
+      color: var(--gray);
+    }
+    
+    /* Balance Section */
+    .balance-section {
+      background: white;
+      margin: 0 16px 16px;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(26, 43, 74, 0.06);
+      text-align: center;
+    }
+    
+    .balance-label {
+      font-size: 14px;
+      color: var(--gray);
+      margin-bottom: 8px;
+    }
+    
+    .balance-amount {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--danger);
+    }
+    
+    .balance-amount.paid {
+      color: var(--success);
+    }
+    
+    .balance-hint {
+      font-size: 14px;
+      color: var(--gray);
+      margin-top: 8px;
+    }
+    
+    /* Settle Button */
+    .settle-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--success);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: all 0.2s ease;
+    }
+    
+    .settle-btn:hover {
+      background: #16A34A;
+      transform: translateY(-2px);
+    }
+    
+    /* History Section */
+    .history-section {
+      background: white;
+      margin: 0 16px;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(26, 43, 74, 0.06);
+    }
+    
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 16px;
+    }
+    
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--light);
+      border-radius: 12px;
+    }
+    
+    .history-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    
+    .history-icon.you-owed {
+      background: #D1FAE5;
+    }
+    
+    .history-icon.you-owe {
+      background: #FEE2E2;
+    }
+    
+    .history-icon.settled {
+      background: #E0E7FF;
+    }
+    
+    .history-info {
+      flex: 1;
+    }
+    
+    .history-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--dark);
+    }
+    
+    .history-date {
+      font-size: 12px;
+      color: var(--gray);
+    }
+    
+    .history-amount {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .history-amount.you-owed {
+      color: var(--success);
+    }
+    
+    .history-amount.you-owe {
+      color: var(--danger);
+    }
+    
+    .history-amount.settled {
+      color: var(--info);
+    }
+    
+    /* Tab Bar */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+    }
+    
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: var(--gray);
+      font-size: 11px;
+      gap: 4px;
+    }
+    
+    .tab-item.active {
+      color: var(--primary);
+    }
+    
+    .tab-item .icon {
+      font-size: 22px;
+    }
+    
+    .tab-item.add .icon {
+      background: var(--primary);
+      color: white;
+      width: 44px;
+      height: 44px;
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-top: -22px;
+      box-shadow: 0 4px 12px rgba(255, 138, 91, 0.4);
+    }
+  </style>
+</head>
+<body style="padding-top: 50px;">
+  <div class="page-nav">
+    <a href="login.html">登入</a>
+    <a href="dashboard.html">首頁</a>
+    <a href="add.html">記帳</a>
+    <a href="charts.html">圖表</a>
+    <a href="settle.html" class="active">分帳</a>
+    <a href="settings.html">設定</a>
+  </div>
+  
+  <!-- Header -->
+  <div class="header">
+    <div class="header-title">🔄 分帳 Settle Up</div>
+    <div class="header-subtitle">你和太太的家庭共同帳戶</div>
+  </div>
+  
+  <!-- Members Card -->
+  <div class="members-section">
+    <div class="members-card">
+      <div class="members-row">
+        <div class="member">
+          <div class="member-avatar you">👨</div>
+          <span class="member-name">你</span>
+          <span class="member-amount">已墊支 HK$8,200</span>
+        </div>
+        <div class="member">
+          <div class="member-avatar wife">👩</div>
+          <span class="member-name">太太</span>
+          <span class="member-amount">已墊支 HK$10,250</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Balance Section -->
+  <div class="balance-section">
+    <div class="balance-label">目前結欠狀態</div>
+    <div class="balance-amount">你欠太太 HK$2,050</div>
+    <div class="balance-hint">太太墊支了較多家庭開銷</div>
+    <button class="settle-btn" onclick="settleUp()">✓ 標記已結清</button>
+  </div>
+  
+  <!-- History Section -->
+  <div class="history-section">
+    <div class="section-title">📋 結欠記錄</div>
+    <div class="history-list">
+      <div class="history-item">
+        <div class="history-icon you-owed">👍</div>
+        <div class="history-info">
+          <div class="history-title">已結清 - 3月</div>
+          <div class="history-date">2026年3月28日</div>
+        </div>
+        <div class="history-amount settled">已結清</div>
+      </div>
+      <div class="history-item">
+        <div class="history-icon you-owe">💸</div>
+        <div class="history-info">
+          <div class="history-title">你欠太太 - 2月</div>
+          <div class="history-date">2026年2月25日</div>
+        </div>
+        <div class="history-amount you-owe">- HK$1,800</div>
+      </div>
+      <div class="history-item">
+        <div class="history-icon you-owed">👍</div>
+        <div class="history-info">
+          <div class="history-title">已結清 - 1月</div>
+          <div class="history-date">2026年1月30日</div>
+        </div>
+        <div class="history-amount settled">已結清</div>
+      </div>
+      <div class="history-item">
+        <div class="history-icon you-owed">💰</div>
+        <div class="history-info">
+          <div class="history-title">太太欠你 - 12月</div>
+          <div class="history-date">2025年12月28日</div>
+        </div>
+        <div class="history-amount you-owed">+ HK$2,300</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <a href="dashboard.html" class="tab-item">
+      <span class="icon">🏠</span>
+      <span>首頁</span>
+    </a>
+    <a href="charts.html" class="tab-item">
+      <span class="icon">📊</span>
+      <span>圖表</span>
+    </a>
+    <a href="add.html" class="tab-item add">
+      <span class="icon">+</span>
+    </a>
+    <a href="settle.html" class="tab-item active">
+      <span class="icon">🔄</span>
+      <span>分帳</span>
+    </a>
+    <a href="settings.html" class="tab-item">
+      <span class="icon">⚙️</span>
+      <span>設定</span>
+    </a>
+  </div>
+  
+  <script>
+    function settleUp() {
+      if (confirm('確認已結清 HK$2,050？')) {
+        alert('已標記為結清！🎉');
+        location.reload();
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>➕ 新增記錄 - 家庭記帳</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --primary: #FF8A5B;
+      --primary-dark: #E67648;
+      --success: #22C55E;
+      --danger: #EF4444;
+      --warning: #F59E0B;
+      --info: #3B82F6;
+      --dark: #1A2B4A;
+      --gray: #4A5568;
+      --light: #F7F8FA;
+      --white: #FFFFFF;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--light);
+      min-height: 100vh;
+      padding-bottom: 100px;
+    }
+    
+    /* Header */
+    .header {
+      background: var(--primary);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .back-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      font-size: 18px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .header-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    
+    /* Page Nav */
+    .page-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      padding: 8px;
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      z-index: 100;
+    }
+    
+    .page-nav a {
+      padding: 6px 12px;
+      background: var(--light);
+      border-radius: 16px;
+      text-decoration: none;
+      color: var(--dark);
+      font-size: 12px;
+    }
+    
+    .page-nav a:hover, .page-nav a.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    /* Type Toggle */
+    .type-toggle {
+      display: flex;
+      margin: 20px 16px;
+      background: white;
+      border-radius: 16px;
+      padding: 6px;
+      box-shadow: 0 2px 8px rgba(26, 43, 74, 0.06);
+    }
+    
+    .toggle-btn {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: transparent;
+      color: var(--gray);
+    }
+    
+    .toggle-btn.active.income {
+      background: var(--success);
+      color: white;
+    }
+    
+    .toggle-btn.active.expense {
+      background: var(--danger);
+      color: white;
+    }
+    
+    /* Amount Input */
+    .amount-section {
+      background: white;
+      margin: 0 16px 16px;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(26, 43, 74, 0.06);
+      text-align: center;
+    }
+    
+    .amount-label {
+      font-size: 14px;
+      color: var(--gray);
+      margin-bottom: 12px;
+    }
+    
+    .amount-input-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .currency {
+      font-size: 32px;
+      color: var(--dark);
+      font-weight: 600;
+    }
+    
+    .amount-input {
+      font-size: 48px;
+      font-weight: 700;
+      color: var(--dark);
+      border: none;
+      outline: none;
+      width: 200px;
+      text-align: center;
+      background: transparent;
+    }
+    
+    .amount-input::placeholder {
+      color: #CBD5E1;
+    }
+    
+    /* Category Grid */
+    .category-section {
+      background: white;
+      margin: 0 16px 16px;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(26, 43, 74, 0.06);
+    }
+    
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 16px;
+    }
+    
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    
+    .category-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 8px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 2px solid transparent;
+      background: var(--light);
+    }
+    
+    .category-item:hover {
+      border-color: var(--primary);
+    }
+    
+    .category-item.selected {
+      border-color: var(--primary);
+      background: #FFF5F2;
+    }
+    
+    .category-icon {
+      font-size: 28px;
+    }
+    
+    .category-name {
+      font-size: 12px;
+      color: var(--gray);
+    }
+    
+    .category-item.selected .category-name {
+      color: var(--primary);
+      font-weight: 500;
+    }
+    
+    /* Date Input */
+    .date-section {
+      background: white;
+      margin: 0 16px 16px;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(26, 43, 74, 0.06);
+    }
+    
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .input-icon {
+      font-size: 20px;
+    }
+    
+    .input-label {
+      font-size: 14px;
+      color: var(--gray);
+    }
+    
+    .date-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid var(--light);
+      border-radius: 10px;
+      font-size: 16px;
+      color: var(--dark);
+      background: var(--light);
+      cursor: pointer;
+    }
+    
+    .date-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: white;
+    }
+    
+    /* Note Input */
+    .note-section {
+      background: white;
+      margin: 0 16px 16px;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(26, 43, 74, 0.06);
+    }
+    
+    .note-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--light);
+      border-radius: 10px;
+      font-size: 16px;
+      color: var(--dark);
+      background: var(--light);
+      resize: none;
+      min-height: 80px;
+    }
+    
+    .note-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: white;
+    }
+    
+    .note-input::placeholder {
+      color: #A0AEC0;
+    }
+    
+    /* Submit Button */
+    .submit-section {
+      padding: 0 16px;
+    }
+    
+    .submit-btn {
+      width: 100%;
+      padding: 18px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(255, 138, 91, 0.4);
+      transition: all 0.2s ease;
+    }
+    
+    .submit-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 138, 91, 0.5);
+    }
+    
+    /* Tab Bar */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+    }
+    
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: var(--gray);
+      font-size: 11px;
+      gap: 4px;
+    }
+    
+    .tab-item.active {
+      color: var(--primary);
+    }
+    
+    .tab-item .icon {
+      font-size: 22px;
+    }
+    
+    .tab-item.add .icon {
+      background: var(--primary);
+      color: white;
+      width: 44px;
+      height: 44px;
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-top: -22px;
+      box-shadow: 0 4px 12px rgba(255, 138, 91, 0.4);
+    }
+  </style>
+</head>
+<body style="padding-top: 50px;">
+  <div class="page-nav">
+    <a href="login.html">登入</a>
+    <a href="dashboard.html">首頁</a>
+    <a href="add.html" class="active">記帳</a>
+    <a href="charts.html">圖表</a>
+    <a href="settle.html">分帳</a>
+    <a href="settings.html">設定</a>
+  </div>
+  
+  <!-- Header -->
+  <div class="header">
+    <a href="dashboard.html" class="back-btn">←</a>
+    <span class="header-title">新增記錄</span>
+  </div>
+  
+  <!-- Type Toggle -->
+  <div class="type-toggle">
+    <button class="toggle-btn income active" onclick="toggleType('income')">💰 收入</button>
+    <button class="toggle-btn expense" onclick="toggleType('expense')">💸 支出</button>
+  </div>
+  
+  <!-- Amount Input -->
+  <div class="amount-section">
+    <div class="amount-label">輸入金額</div>
+    <div class="amount-input-wrapper">
+      <span class="currency">HK$</span>
+      <input type="number" class="amount-input" placeholder="0" id="amountInput">
+    </div>
+  </div>
+  
+  <!-- Category Grid -->
+  <div class="category-section">
+    <div class="section-title">選擇類別</div>
+    <div class="category-grid">
+      <div class="category-item selected" data-category="food" onclick="selectCategory(this)">
+        <span class="category-icon">🍜</span>
+        <span class="category-name">餐飲</span>
+      </div>
+      <div class="category-item" data-category="transport" onclick="selectCategory(this)">
+        <span class="category-icon">🚇</span>
+        <span class="category-name">交通</span>
+      </div>
+      <div class="category-item" data-category="shopping" onclick="selectCategory(this)">
+        <span class="category-icon">🛒</span>
+        <span class="category-name">購物</span>
+      </div>
+      <div class="category-item" data-category="rent" onclick="selectCategory(this)">
+        <span class="category-icon">🏠</span>
+        <span class="category-name">屋租</span>
+      </div>
+      <div class="category-item" data-category="medical" onclick="selectCategory(this)">
+        <span class="category-icon">🏥</span>
+        <span class="category-name">醫療</span>
+      </div>
+      <div class="category-item" data-category="entertainment" onclick="selectCategory(this)">
+        <span class="category-icon">🎮</span>
+        <span class="category-name">娛樂</span>
+      </div>
+      <div class="category-item" data-category="salary" onclick="selectCategory(this)">
+        <span class="category-icon">💰</span>
+        <span class="category-name">薪酬</span>
+      </div>
+      <div class="category-item" data-category="other" onclick="selectCategory(this)">
+        <span class="category-icon">📦</span>
+        <span class="category-name">其他</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Date Input -->
+  <div class="date-section">
+    <div class="input-group">
+      <span class="input-icon">📅</span>
+      <span class="input-label">日期</span>
+      <input type="date" class="date-input" id="dateInput" value="2026-04-21">
+    </div>
+  </div>
+  
+  <!-- Note Input -->
+  <div class="note-section">
+    <div class="section-title">備註</div>
+    <textarea class="note-input" placeholder="加入備註...（選填）"></textarea>
+  </div>
+  
+  <!-- Submit Button -->
+  <div class="submit-section">
+    <button class="submit-btn" onclick="submitRecord()">✓ 確認記錄</button>
+  </div>
+  
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <a href="dashboard.html" class="tab-item">
+      <span class="icon">🏠</span>
+      <span>首頁</span>
+    </a>
+    <a href="charts.html" class="tab-item">
+      <span class="icon">📊</span>
+      <span>圖表</span>
+    </a>
+    <a href="add.html" class="tab-item add">
+      <span class="icon">+</span>
+    </a>
+    <a href="settle.html" class="tab-item">
+      <span class="icon">🔄</span>
+      <span>分帳</span>
+    </a>
+    <a href="settings.html" class="tab-item">
+      <span class="icon">⚙️</span>
+      <span>設定</span>
+    </a>
+  </div>
+  
+  <script>
+    let currentType = 'income';
+    
+    function toggleType(type) {
+      currentType = type;
+      document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelector(`.toggle-btn.${type}`).classList.add('active');
+    }
+    
+    function selectCategory(el) {
+      document.querySelectorAll('.category-item').forEach(item => item.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+    
+    function submitRecord() {
+      const amount = document.getElementById('amountInput').value;
+      const date = document.getElementById('dateInput').value;
+      const category = document.querySelector('.category-item.selected .category-name').textContent;
+      const note = document.querySelector('.note-input').value;
+      
+      if (!amount) {
+        alert('請輸入金額');
+        return;
+      }
+      
+      // Mock submission - in real app would save to backend
+      const typeText = currentType === 'income' ? '收入' : '支出';
+      const prefix = currentType === 'income' ? '+' : '-';
+      alert(`${typeText} HK$${prefix}${amount} 已記錄！\n類別：${category}\n日期：${date}${note ? '\n備註：' + note : ''}`);
+      
+      // Reset form
+      document.getElementById('amountInput').value = '';
+      document.querySelector('.note-input').value = '';
+    }
+    
+    // Set today's date as default
+    document.getElementById('dateInput').valueAsDate = new Date();
+  </script>
+</body>
+</html>
